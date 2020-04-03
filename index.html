@@ -1,13 +1,1677 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>动态趋势图</title>
+    <script src="./js/three.js"></script>
+    <script src="./js/Projector.js"></script>
+
+    <script src="./js/jquery.js"></script>
+    <script src="./js/OrbitControls.js"></script>
+    <script src="./js/CanvasRenderer.js"></script>
+    <script src="./js/ClearPass.js"></script>
+    <script src="./js/CopyShader.js"></script>
+    <script src="./js/EffectComposer.js"></script>
+    <script src="./js/FXAAShader.js"></script>
+    <script src="./js/OutlinePass.js"></script>
+    <script src="./js/ShaderPass.js"></script>
+    <script src="./js/RenderPass.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="css/1.css" />
+    <style>
+        body {
+            overflow: hidden;
+            margin:0;
+        }
+    </style>
 </head>
 <body>
-<h1>nihao</h1>
+<div class="Time_box">
+    <span id="timer" style="display: block;font-size: 22px;font-family:center;line-height:25px;"></span>
+</div>
+<!--<input type="text" id="teamName" value="腾讯公司"><button id="creatTeam">生成战队</button><button id="surBtn">确定位置</button><button id="delBttn">删除战队</button>-->
+<!--<button id="careatLine">生成线</button>-->
+<div class="left_box">
+    <div class="box_logo">
+        <img src="./asset/logo.png" style="width: 20px;height: 20px;margin-right: 5px" /> 金融业网络安全攻防比赛</div>
+</div>
+<div id="box_log01"></div>
+<div class="bao">
+</div>
+<div id="moreP">
+    <div class="content">
+        <div id="Ctop">
+            <div style="width: 100%;text-align: center;"> 排行榜</div>
+        </div>
+        <div class="titlebox">
+            <span>排名</span>
+            <span>头像</span>
+            <span style="width: 100px">战队</span>
+            <span>得分</span>
+        </div>
+        <div id="rank_list"></div>
+
+    </div>
+</div>
+<div id="title1"></div>
+<div id="title">
+    <div id="scorll_area"></div>
+</div>
+<div id="shishigongji">
+    <!--<div id="11" ></div>-->
+</div>
+<div id="moreTime">
+    <a href="table.html">
+        <div class="title_in">实时攻击</div>
+    </a>
+    <div class="top">
+        <span>攻击时间</span>
+        <span>攻击源</span>
+        <span>攻击目标</span>
+        <span>攻击类型</span>
+        <span>端口</span>
+    </div>
+    <div class="content" id="attack_List">
+        <!-- 攻击列表 -->
+    </div>
+</div>
+<div id="contentBox"></div>
+<input type="text" hidden id="shangyiye">
+<input type="text" hidden id="xiayiye">
+
+<script>
+    (function () {
+        var log = console.log.bind(console);
+        var deg=Math.PI/2;
+        var _mouse = new THREE.Vector2();
+        var raycaster = new THREE.Raycaster();
+        var raycaster1 = new THREE.Raycaster();
+        var group = {};
+        var roationGroup = new THREE.Group();
+        var earthModel = new THREE.Object3D();
+        var isup = true;
+        var moveObj;
+        var wallHole = {};
+        var pointFlag=false;
+        var clickTame=false;
+        var tName;
+        var groupLine = [];
+        var groupLines = new THREE.Group();
+        var groupLines2 = new THREE.Group();
+        var groupLines4 = new THREE.Group();
+        var groupLines5 = new THREE.Group();
+        var groupLines6 = new THREE.Group();
+        var groupLines7 = new THREE.Group();
+        var groupLines3 = new THREE.Group();
+        var groupLines1 = new THREE.Group();
+        // var groupPoints = [];
+        var groupPoints = new THREE.Group();
+        var groupPoints1 = new THREE.Group();
+        var animateDots = [];
+        var animateDots1 = [];
+        var selectedObjects = [];
+        var vIndex = 0;
+        var vIndex1 = 0;
+        var color = "#ffff00";
+        var p1 , p2 ;
+        var outlinePass;
+        var pianyi_x, pianyi_y, _x, _y;
+        var cube1, theHol;
+        var intersects1, p1_x, p1_y, p2_x, p2_y, result, mouse_move = new THREE.Vector2();
+        var el = document.getElementById('contentBox'); //挂载点
+        var threeViewSize = {
+            width: window.innerWidth,
+            height: window.innerHeight
+        }; // 当前窗口大小
+        //初始信息 战队名战队位置
+        var initMessage = [
+            {
+                "id": "1385",
+                "name": "财付通",
+                "positions": {
+                    "x": -130.74354462284,
+                    "y": 47.610795678516,
+                    "z": 55.998930122535
+                },
+                "type": 1
+            }, {
+                "id": "1384",
+                "name": "渤海证券",
+                "positions": {
+                    "x": 18.653725230709,
+                    "y": 19.441692704382,
+                    "z": -147.55640438204
+                },
+                "type": 1
+            }, {
+                "id": "1386",
+                "name": "东海证券",
+                "positions": {
+                    "x": 58.673888124687,
+                    "y": -119.4618516994,
+                    "z": -69.159590609248
+                },
+                "type": 1
+            }, {
+                "id": "1387",
+                "name": "工商银行",
+                "positions": {
+                    "x": 143.57133866974,
+                    "y": 27.901477824755,
+                    "z": -33.232714019891
+                },
+                "type": 1
+            }, {
+                "id": "1388",
+                "name": "建设银行",
+                "positions": {
+                    "x": -93.207026332181,
+                    "y": -63.158110963538,
+                    "z": -99.105220349204
+                },
+                "type": 1
+            }, {
+                "id": "1389",
+                "name": "交通银行",
+                "positions": {
+                    "x": -57.935387441756,
+                    "y": 126.57966229963,
+                    "z": -55.850154982441
+                },
+                "type": 1
+            }, {
+                "id": "1390",
+                "name": "蚂蚁金服",
+                "positions": {
+                    "x": 6.8493016243125,
+                    "y": 67.515028733869,
+                    "z": 133.75187262115
+                },
+                "type": 1
+            }, {
+                "id": "1391",
+                "name": "机器人",
+                "positions": {
+                    "x": -15.926445064653,
+                    "y": -52.206268339831,
+                    "z": 139.69586052007
+                },
+                "type": 1
+            }];
+        var points = [
+            {
+                "1": {"x": -87.23918663830922, "y": -14.581053857394453, "z": 121.13340652728613},
+                "2": {"x": -44.96859106314668, "y": -79.25403618311486, "z": 119.12706165664224},
+            },
+            {
+                "1": {"x": -87.23918663830922, "y": -14.581053857394453, "z": 121.13340652728613},
+                "4": {"x": 97.75962451580483, "y": 58.63034003502854, "z": 97.48523537498113},
+            },
+            {
+                "1":{"x": -87.23918663830922, "y": -14.581053857394453,"z":121.13340652728613},
+                "3":{"x": -7.08465829421915, "y": 7.084658294219157, "z": 149.6463671593297},
+
+            },
+            {
+                "3":{"x": -7.08465829421915, "y": 7.084658294219157, "z": 149.6463671593297},
+                "1":{"x": -87.23918663830922, "y": -14.581053857394453,"z":121.13340652728613},
+            },
+            {
+                "2":{"x": -44.96859106314668, "y": -79.25403618311486, "z": 119.12706165664224},
+                "1":{"x": -87.23918663830922, "y": -14.581053857394453,"z":121.13340652728613},
+            },
+            {
+                "4":{"x": 97.75962451580483, "y": 58.63034003502854, "z": 97.48523537498113},
+                "3":{"x": -7.08465829421915, "y": 7.084658294219157, "z": 149.6463671593297},
+            },
+        ];
+        // var pointsL=[
+        //     [
+        //         {"p1":"藤光讯李青公司","p2":"阿里巴巴公司"},
+        //         {"x": -87.23918663830922, "y": -14.581053857394453, "z": 121.13340652728613},
+        //         {"x": -44.96859106314668, "y": -79.25403618311486, "z": 119.12706165664224}
+        //     ],[
+        //         {"p1":"藤光讯李青公司","p2":"民生银行公司"},
+        //         {"x": -87.23918663830922, "y": -14.581053857394453, "z": 121.13340652728613},
+        //         {"x": 97.75962451580483, "y": 58.63034003502854, "z": 97.48523537498113}
+        //     ],[
+        //         {"p1":"藤光讯李青公司","p2":"中信银行"},
+        //         {"x": -87.23918663830922, "y": -14.581053857394453,"z":121.13340652728613},
+        //         {"x": -7.08465829421915, "y": 7.084658294219157, "z": 149.6463671593297}
+        //
+        //     ],[
+        //         {"p1":"中信银行","p2":"藤光讯李青公司"},
+        //         {"x": -7.08465829421915, "y": 7.084658294219157, "z": 149.6463671593297},
+        //         {"x": -87.23918663830922, "y": -14.581053857394453,"z":121.13340652728613}
+        //     ],[
+        //         {"p1":"阿里巴巴公司","p2":"藤光讯李青公司"},
+        //         {"x": -44.96859106314668, "y": -79.25403618311486, "z": 119.12706165664224},
+        //         {"x": -87.23918663830922, "y": -14.581053857394453,"z":121.13340652728613}
+        //     ]
+        // ];
+        var ThreeView = function () {
+            this.el = el;
+            this.scene = null;
+            this.camera = null;
+            this.renderer = null;
+            this.controls = null;
+            this.light = null;
+            this.dlight = null;
+            // this.outlinePass = null;
+            this.composer = null;
+
+            this._initView();
+            this._animate();
+            document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false);
+            document.addEventListener('mouseup', this.onDocumentMouseUp.bind(this), false);
+            document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false);
+            // document.getElementById('surBtn').addEventListener('click', this.onClicksurBtn.bind(this), false);
+            // document.getElementById('creatTeam').addEventListener('click', this.onClickCreatTime.bind(this), false);
+            // document.getElementById('delBttn').addEventListener('click', this.onClickDelTame.bind(this), false);
+            // document.getElementById('careatLine').addEventListener('click', this.onClickcareatline.bind(this), false);
+            window.addEventListener('resize', this.onWindowResize.bind(this), false);
+        };
+        ThreeView.prototype = {
+            constructor: ThreeView,
+            _initView: function () {
+                this._initRenderer(threeViewSize, this.el);
+                this._initSence();
+                this._initCamera();
+                this._initLight();
+                this._initComposer();
+                this._initControls(this.camera, this.el);
+
+                // this.careatline();
+            },
+            _initSence: function () {
+                var scene = new THREE.Scene({clearColor:'#fffffff'});
+                scene.background = new THREE.CubeTextureLoader()
+                    .setPath('./img/')
+                    // .load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png']);
+                    // .load(['3.jpg', '3.jpg', '3.jpg', '3.jpg', '3.jpg', '3.jpg']);
+                    // .load(['6.png', '2.png', '6.png', '2.png', '6.png', '2.png']);
+                    .load(['6.png', '6.png', '6.png', '6.png', '6.png', '6.png']);
+                this.scene = scene;
+                // @todo remove
+                window.scene = this.scene;
+            },
+            _initCamera: function () {
+                var camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 10000);
+                camera.position.set(0, 0, 500);//原始镜头
+
+                this.camera = camera;
+            },
+            onWindowResize: function () {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this._render();
+            },
+            _initRenderer: function (viewSize, el) {
+                var renderer = new THREE.WebGLRenderer({
+                    antialias: true, // 开启反锯齿
+                    alpha: true // 背景透明
+                });
+                renderer.setClearColor(0x000000);
+                renderer.setSize(viewSize.width, viewSize.height);
+                this.el.appendChild(renderer.domElement);
+                this.renderer = renderer;
+            },
+            _addObject: function () {
+                var earthGeo = new THREE.SphereGeometry(150, 200, 200);
+                var earthMater = new THREE.MeshPhongMaterial({
+                    map: new THREE.TextureLoader().load('./asset/heightMap.jpg'),
+                    side: THREE.DoubleSide,
+                });
+                var earthMesh = new THREE.Mesh(earthGeo, earthMater);
+                earthModel = earthMesh;
+                scene.add(earthMesh);
+            },
+            _initLight: function () {
+                var ambientLight = new THREE.AmbientLight(0xfffffff); // 环境光
+                this.scene.add(ambientLight);
+                var d_light=new THREE.DirectionalLight("#cfcfcf");
+                d_light.target=earthModel;
+                d_light.castShadow=true;
+                d_light.shadowCameraVisible=true;
+                this.dlight = d_light;
+                this.scene.add(d_light);
+            },
+            _initComposer: function () {
+                // 着色渲染器，以后研究一下，目前有锯齿不知道如何处理，使用FXAA并没有很好的解决。
+                // 使用效果组合器渲染2D背景
+                var effectFXAA;
+                this.composer = new THREE.EffectComposer(this.renderer);
+                var renderPass = new THREE.RenderPass(this.scene, this.camera);
+                this.composer.addPass(renderPass);
+                outlinePass = new THREE.OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), this.scene, this.camera);
+                this.composer.addPass(outlinePass);
+                effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
+                effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
+                effectFXAA.renderToScreen = true;
+                this.composer.addPass(effectFXAA);
+            },
+            _initControls: function (camera, rendererDomEle) {
+                // console.log(rendererDomEle);
+                var controls = new THREE.OrbitControls(camera, rendererDomEle);
+                controls.enableDamping = true;//使用阻尼或自转 即是否有惯性
+                controls.dompingFactor = 0.75; // 动态阻尼系数 即鼠标拖拽旋转灵敏度
+                controls.enableZoom = true; // 缩放
+                controls.autoRotate = false; // 自动旋转
+                controls.minDistance = 10; // 相机距离原点最近距离
+                controls.maxDistance = 600; // 相机距离原点最远距离
+                controls.enablePan = true; // 是否开启右键拖拽
+                this.controls = controls;
+            },
+            _render: function () {
+                this.camera.lookAt(this.scene.position);
+                this.renderer.render(this.scene, this.camera);
+            },
+            _animate: function () {
+                requestAnimationFrame(this._animate.bind(this));
+                this.controls.update();
+
+                this.composer.render();
+                // this._render();
+                // this.
+                deg+=1/8*Math.PI/180;//每次转动1/6度
+                this.camera.position.x=Math.sin(deg)*500;
+                this.camera.position.z=Math.cos(deg)*500;
+                this.dlight.position.x=Math.sin(deg)*500;
+                this.dlight.position.z=Math.cos(deg)*500;
+                // groupPoints.rotation.y += 0.01;
+                // groupLines.rotation.y += 0.01;
+                // earthModel.rotation.y +=0.007;
+                // this.scene.rotation.y +=0.01;
+            },
+
+            // onClickCreatTime:function(){
+            //     // console.log('点击生成战队');
+            //     pointFlag = true;
+            //     var name = document.getElementById('teamName').value;
+            //     if (name) {
+            //         // console.log(name);
+            //         var tameName = this.createSpriteShape(name);
+            //         tName = tameName;
+            //         this.scene.add(tameName);
+            //     }
+            // },
+            initTeam:function(){
+                var _this = this;
+                initMessage.forEach(function(val,index){
+                    var tameName1 = _this.createSpriteShape(val.name);
+                    tameName1.name = val.name;
+                    // debugger
+                    tameName1.position.copy(val.positions);
+                    this.scene.add(tameName1);
+                })
+            },
+            // onClicksurBtn:function(){
+            //     pointFlag = false;
+            // },
+            // onClickDelTame:function(){
+            //     var name = document.getElementById('teamName').value;
+            //     this.scene.remove(this.scene.getObjectByName(name));
+            // },
+            onDocumentMouseDown: function () {
+                // console.log('down');
+                _mouse.x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1;
+                _mouse.y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1;
+
+                raycaster.setFromCamera(_mouse, this.camera);
+                var intersects = raycaster.intersectObjects([this.scene], true);
+                if (intersects.length > 0) {
+                    // console.log(intersects[0].point);
+                    //获取名称
+                    if(pointFlag && true){
+                        console.log('确定点位置',intersects[0].point);
+                        tName.position.copy(intersects[0].point);
+                    }
+                    //创建精灵图位置为点击位置
+
+                    //点击位置完成请求保存
+
+                    //进入下一个位置保存
+                }
+            },
+            onDocumentMouseMove: function () {
+                // console.log('move');
+            },
+            onDocumentMouseUp: function () {
+                // console.log('up');
+            },
+            createSpriteShape:function(name) {
+                // console.log(name);
+                let canvas = document.createElement("canvas");
+                let ctx = canvas.getContext("2d");
+                // var color = "#ffff00";
+                ctx.fillStyle = color;
+                ctx.font = " 50px Arial";
+                ctx.lineWidth = 2;
+                ctx.fillText(name,6,100);
+                let texture = new THREE.Texture(canvas);
+                texture.needsUpdate = true;
+
+                //使用Sprite显示文字
+                let material = new THREE.SpriteMaterial({
+                    map:texture,
+                    depthTest: false,
+                    transparent:true,
+                });
+                let textObj = new THREE.Sprite(material);
+                textObj.scale.set(0.5 * 100, 0.3 * 100, 1);
+                textObj.name = name;
+                textObj.position.set(0,0,0);
+                // console.log();
+                return textObj;
+            },
+            onClickcareatline:function(pointsL,type){
+                if(type === 1){
+                    // console.log('清理前啊',animateDots);
+                    animateDots = [];
+                    // console.log('清理之后',animateDots);
+                    this.scene.remove(groupLines);
+                    this.scene.remove(groupPoints);
+
+                    // groupLines = new THREE.Group();
+                    groupLines.children = [];
+                    groupPoints.children = [];
+                    this.careatline(pointsL,type);
+                    this.scene.add(groupLines);
+                    // this.scene.add(groupLines2);
+                    // this.scene.add(groupLines4);
+                    // this.scene.add(groupLines6);
+                    outlinePass.selectedObjects = groupPoints;
+                    this.scene.add(groupPoints);
+                    vIndex = 0;
+                    animateLine(pointsL,type);
+                    var flag = 2;
+                    this.changeColor(flag,pointsL);
+                }else if(type ===2){
+                    //处理不得分
+                    animateDots1 = [];
+                    // console.log('清理之后',animateDots);
+                    this.scene.remove(groupLines1);
+                    this.scene.remove(groupPoints1);
+
+                    // groupLines = new THREE.Group();
+                    groupLines1.children = [];
+                    groupPoints1.children = [];
+                    this.careatline(pointsL,type);
+                    this.scene.add(groupLines1);
+                    // this.scene.add(groupLines3);
+                    // this.scene.add(groupLines5);
+                    // this.scene.add(groupLines7);
+                    this.scene.add(groupPoints1);
+                    vIndex1 = 0;
+                    animateLine1(pointsL,type);
+                    var flag = 2;
+                    this.changeColor(flag,pointsL);
+                }
+
+            },
+            careatline:function(pointsL,type){
+                // var p1 = points.p1;
+                // var p2 = points.p2;
+                // console.log(p1,p2);
+                // point.forEach()
+                // debugger
+                pointsL.forEach(function(val,index){
+
+                    // var c1 = val[0].p1.toString() + val[0].p2.toString();
+                    // var c2 = val[0].p2.toString() + val[0].p1.toString();
+                    // console.log(cc);
+                    // debugger
+                    // if(groupLine.indexOf(c1)=== -1 || groupLine.indexOf(c2)=== -1){
+                    // if(groupLine.indexOf(c1)=== -1){
+                    //     groupLine.push(c1);
+                    // groupLine.push(c2);
+                    // battle.push(val[0]);
+
+                    // line.name = c1;
+
+                    if(type === 1){
+                        var line=addLines(val[1],val[2]);
+                        groupLines.add(line.lineMesh);
+                        // groupLines2.add(line.lineMesh);
+                        // groupLines4.add(line.lineMesh);
+                        // groupLines6.add(line.lineMesh);
+
+                        animateDots.push(line.curve.getPoints(100));
+                        // debugger
+                        careatPoint(type);
+                    }else if(type === 2){
+                        var line=addLines(val[1],val[2]);
+                        groupLines1.add(line.lineMesh);
+                        // groupLines3.add(line.lineMesh);
+                        // groupLines5.add(line.lineMesh);
+                        // groupLines7.add(line.lineMesh);
+                        outlinePass.selectedObjects = groupLines1;
+                        animateDots1.push(line.curve.getPoints(100));
+                        careatPoint(type);
+                    }
+
+                    // }
+                });
+
+            },
+            changeColor:function (flag,pointsL){
+                var _this = this;
+                // console.log(pointsL[0]);
+                if(pointsL !== undefined){
+                    pointsL.forEach((bat,index) =>{
+                        // debugger
+                        // console.log('232323',_this.scene.getObjectByName(bat[0].p1),bat[0].p1);
+                        //     console.log(bat);
+                        this.scene.remove(_this.scene.getObjectByName(bat[0].p1));
+                        if(flag === 1){
+                            color = "#ffff00";
+                        }
+                        else{
+                            color = "#c0c";
+                        }
+
+                        p1 = _this.createSpriteShape(bat[0].p1);
+                        p1.position.copy(bat[1]);
+                        this.scene.add(p1);//.position.copy(bat[1])
+
+                        _this.scene.remove(_this.scene.getObjectByName(bat[0].p2));
+
+                        if (flag === 1) {
+                            color = "#ffff00";
+                        }
+                        else {
+                            color = "#f00000";
+                        }
+                        p2 = _this.createSpriteShape(bat[0].p2);
+                        p2.position.copy(bat[2]);
+                        this.scene.add(p2);//.position.copy(bat[2])
+                        // this.createSpriteShape();
+                        // this.scene.getObjectById(bat.p1).material.color
+                    });
+                }
+
+            },
+            //     changeColor1:function (flag,pointsL){
+            //         var _this = this;
+            //         // console.log(pointsL[0]);
+            //         pointsL.forEach((bat,index) =>{
+            //             debugger
+            //         // console.log('232323',_this.scene.getObjectByName(bat[0].p1),bat[0].p1);
+            //         //     console.log(bat);
+            //         this.scene.remove(_this.scene.getObjectByName(bat[0].p1));
+            //         if(flag === 1){
+            //             color = "#ffff00";
+            //         }
+            //         else{
+            //             color = "#c0c";
+            //         }
+            //
+            //         p1 = _this.createSpriteShape(bat[0].p1);
+            //         p1.position.copy(bat[1]);
+            //         this.scene.add(p1);//.position.copy(bat[1])
+            //
+            //         _this.scene.remove(_this.scene.getObjectByName(bat[0].p2));
+            //
+            //             if (flag === 1) {
+            //                 color = "#ffff00";
+            //             }
+            //             else {
+            //                 color = "#f00000";
+            //             }
+            //         p2 = _this.createSpriteShape(bat[0].p2);
+            //         p2.position.copy(bat[2]);
+            //         this.scene.add(p2);//.position.copy(bat[2])
+            //         // this.createSpriteShape();
+            //         // this.scene.getObjectById(bat.p1).material.color
+            //     });
+            // },
+        };
+
+        var ThreeView = new ThreeView();
+
+        ThreeView._addObject();
+        ThreeView.initTeam();
+
+
+        function careatPoint(type){
+            if(type === 1){
+                var aGeo = new THREE.BoxGeometry(3, 3,3 );//SphereGeometry
+                var aMater = new THREE.MeshPhongMaterial({
+                    color: '#a09cff',
+                    transparent: true,
+                    opacity: 0.6
+                });
+                var aMesh = new THREE.Mesh(aGeo, aMater);
+                groupPoints.add(aMesh);
+            }else if(type === 2){
+                var aGeo1 = new THREE.BoxGeometry(3, 3,3 );//SphereGeometry
+                var aMater1 = new THREE.MeshPhongMaterial({
+                    color: '#fff',
+                    transparent: true,
+                    opacity: 0.6
+                });
+                var aMesh1 = new THREE.Mesh(aGeo1, aMater1);
+                groupPoints1.add(aMesh1);
+            }
+        }
+        function addLines(v, c) {
+            var v0 = new THREE.Vector3(v.x, v.y, v.z);
+            var v3 = new THREE.Vector3(c.x, c.y, c.z);
+            // 夹角
+            var angle = v0.angleTo(v3) * 180 / Math.PI / 10; // 0 ~ Math.PI
+            var aLen = angle * 15,
+                hLen = angle * angle * 120;
+            var p0 = new THREE.Vector3(0,0,0);
+
+
+            // debugger
+            // 法线向量
+            var rayLine = new THREE.Ray(p0, getVCenter(v0.clone(), v3.clone()).normalize());//原来的
+
+            // 顶点坐标
+            var vtop = rayLine.at(hLen / rayLine.at(1).distanceTo(p0));
+
+            // 控制点坐标
+            var v1 = getLenVcetor(v0.clone(), vtop, aLen);
+            var v2 = getLenVcetor(v3.clone(), vtop, aLen);
+
+            // 绘制贝塞尔曲线
+            var curve = new THREE.CubicBezierCurve3(v0, v1, v2, v3);
+            var geometry = new THREE.Geometry();
+            geometry.vertices = curve.getPoints(50);
+            var lineColor = new THREE.Color();
+            lineColor.setHSL(1, 1.0, 0.5);
+
+            var material = new THREE.LineBasicMaterial({
+                color: "#FFD700",    //线条颜色
+                transparent: true,
+                opacity: 0.6,    //透明度
+                depthTest: true,
+                fog:true
+            });
+            // var curve = new THREE.CubicBezierCurve3(v0, v1, v2, v3);
+            // var points = curve.getPoints( 50 );
+            // var geometry = new THREE.Geometry().setFromPoints( points );
+            //
+            // var material = new THREE.LineBasicMaterial( { color : 0xFFD700 } );
+
+            // Create the final object to add to the scene
+            // var curveObject = new THREE.Line( geometry, material );
+            // Create the final object to add to the scene
+            var lin = new THREE.Line(geometry, material);
+            return {
+                curve: curve,
+                lineMesh: lin
+            };
+        }
+        // 计算中点
+        function getVCenter(v1, v2) {
+            var v = v1.add(v2);
+            return v.divideScalar(2);
+        }
+        // 计算向量固定长度的点
+        function getLenVcetor(v1, v2, len) {
+            var v1v2Len = v1.distanceTo(v2);
+            return v1.lerp(v2, len / v1v2Len);
+        }
+        function animateLine(type , formData){
+            if(groupPoints !== undefined){
+                groupPoints.children.forEach((elem, index) => {
+                    let v = animateDots[index][vIndex];
+                    elem.position.set(v.x, v.y, v.z);
+                });
+                vIndex++;
+                if (vIndex > 100) {
+                    vIndex = 0;
+                    animateDots = [];
+                    var flag = 1;
+                    ThreeView.changeColor(flag,formData);
+                    return false;
+                }
+
+            }
+
+
+
+            requestAnimationFrame(animateLine);
+        }
+        function animateLine1(type , formData){
+
+            if(groupPoints1 !== undefined){
+                groupPoints1.children.forEach((elem, index) => {
+                    let v = animateDots1[index][vIndex1];
+                    elem.position.set(v.x, v.y, v.z);
+                });
+                vIndex1++;
+                if (vIndex1 > 100) {
+                    vIndex1 = 0;
+                    animateDots1 = [];
+                    var flag = 1;
+                    ThreeView.changeColor(flag,formData);
+                    return false;
+                }
+            }
+
+            requestAnimationFrame(animateLine1);
+        }
+
+
+        var maxtime = 60 * 60; //一个小时，按秒计算，自己调整!
+
+        function myFunction() {
+            setInterval(function(){  if (maxtime >= 0) {
+                var minutes = Math.floor(maxtime / 60);
+                var seconds = Math.floor(maxtime % 60);
+                var msg = "00" + ":" + minutes + ":" + seconds;
+                window.document.all["timer"].innerHTML = msg;
+                if (maxtime == 5 * 60) {
+                    alert("还剩5分钟");
+
+                }
+                --maxtime;
+            } else {
+                clearInterval(timer);
+                alert("时间到，结束!");
+            }; }, 1000);
+        }
+        myFunction();
+
+        function pertext(data){
+            if (data.length != 0) {
+                // flag1 = true;
+
+                var time = Math.ceil(data.length / 5);
+                var page0 = 0;
+                var page = 1;
+                var insertText = ' <ul style="margin:0px">';
+
+                function onload() {
+                    // debugger
+                    for (var i in data) {
+                        if (i >= page0 * 5 && i < page * 5) {
+                            insertText += '<li style="margin-top: 0;">';
+                            insertText += ' <span class="attckTime" style="color:' + data[i][3].attack_color +';">' + data[i][3].attack_time + ' </span>';
+                            insertText += ' <span class="attckName" style="color:' + data[i][3].attack_color +';">' + data[i][0].p1 + '</span>';
+                            insertText += ' <span class="attckTarget" style="color:' + data[i][3].attack_color +';">' + data[i][0].p2 + '</span>';
+                            insertText += ' <span class="attckType" style="color:' + data[i][3].attack_color +';">' + data[i][3].type + '</span>';
+                            insertText += ' <span class="attckPort" style="color:' + data[i][3].attack_color +';">' + data[i][3].attack_port + '</span>';
+                            insertText += '</li>';
+                            insertText += '<div class="back_Uinfo"></div>';
+                        }
+                    }
+
+                }
+
+                function setpage() {
+                    if (page <= time) {
+                        page0 = page0 + 1;
+                        page = page + 1;
+                    }
+                    document.getElementById("attack_List").innerHTML = "";
+                }
+
+                // locationLoad();
+                var tral1 = setInterval(function() {
+                    // function locationLoad() {
+                    if (page == 1) {
+                        insertText = "";
+                        onload();
+                        setpage();
+                        document.getElementById("attack_List").innerHTML = "";
+                    } else if (1 < page && page < time) {
+                        insertText = "";
+                        onload();
+                        setpage();
+                    } else if (page == time) {
+                        insertText = "";
+                        onload();
+                        page = 1;
+                        page0 = 0;
+                        document.getElementById("attack_List").innerHTML = "";
+                        clearInterval(tral1);
+                    }
+                    insertText += ' </ul>';
+                    document.getElementById("attack_List").innerHTML = insertText;
+                    // setTimeout(locationLoad, 5000);
+                    // }
+                },1000)
+            }
+        }
+
+        var rank_list ;
+        var time ;
+        var page0 = 0;
+        var page = 1;
+        var phbdata;
+        var rankInsertHtml;
+        function phb(){
+            rank_list = phbdata.json;
+            time = Math.ceil((rank_list.length - 10) / 7) + 1;
+            page0 = 0;
+            page = 1;
+
+
+            rankInsertHtml = ' <ul>';
+            rankInsertHtml += '<a href="rank.html">';
+            function onload() {
+
+                for (var i in rank_list) {
+                    if(page === 1 ){
+                        if (i >= ((page-1) * 10) && i < page * 10) {
+                            rankInsertHtml += '<li>';
+                            rankInsertHtml += ' <span>' + rank_list[i].rank + '</span>';
+                            rankInsertHtml += ' <span><img src="' + "./asset/" + rank_list[i].user_picture + '" alt="" /></span>';
+                            rankInsertHtml += ' <span class="team" style="width: 100px;">' + rank_list[i].playerName + '</span>';
+                            rankInsertHtml += ' <span class="getScore">' + rank_list[i].score + '</span>';
+                            rankInsertHtml += '</li>';
+                            rankInsertHtml += '<div class="back_Uinfo"></div>';
+                        }
+                    }else{
+                        if(i<3){
+                            rankInsertHtml += '<li>';
+                            rankInsertHtml += ' <span>' + rank_list[i].rank + '</span>';
+                            rankInsertHtml += ' <span><img src="' + "./asset/" + rank_list[i].user_picture + '" alt="" /></span>';
+                            rankInsertHtml += ' <span class="team" style="width: 100px;">' + rank_list[i].playerName + '</span>';
+                            rankInsertHtml += ' <span class="getScore">' + rank_list[i].score + '</span>';
+                            rankInsertHtml += '</li>';
+                            rankInsertHtml += '<div class="back_Uinfo"></div>';
+                        }
+
+                        // debugger
+                        if (i >= (page * 7)-4 && i < (page * 7)+3) {
+                            rankInsertHtml += '<li>';
+                            rankInsertHtml += ' <span>' + rank_list[i].rank + '</span>';
+                            rankInsertHtml += ' <span><img src="' + "./asset/" + rank_list[i].user_picture + '" alt="" /></span>';
+                            rankInsertHtml += ' <span class="team" style="width: 100px;">' + rank_list[i].playerName + '</span>';
+                            rankInsertHtml += ' <span class="getScore">' + rank_list[i].score + '</span>';
+                            rankInsertHtml += '</li>';
+                            rankInsertHtml += '<div class="back_Uinfo"></div>';
+                        }
+
+                    }
+
+                }
+            }
+
+
+
+            function careatpage() {
+                rankInsertHtml += '</a>';
+                rankInsertHtml += '<li>';
+                rankInsertHtml += '<div class = "point_currage">';
+                rankInsertHtml += '<img class = "point_currage_image" id="shangyiye" src = "./asset/pointLeft.png" />';
+                rankInsertHtml += "第" + page + "页";
+                rankInsertHtml += '<img class = "point_currage_image" id="xiayiye" src = "./asset/pointRight.png" />';
+                rankInsertHtml += '</div> </li>';
+                rankInsertHtml += '</ul>';
+            }
+
+            function setpage() {
+                if (page <= time) {
+                    page0 = page0 + 1;
+                    page = page + 1;
+                }
+                document.getElementById("rank_list").innerHTML = "";
+            }
+
+            // document.getElementById("rank_list").innerHTML = "";
+            // locationLoad();
+            var tral = setInterval(function(){
+                // function locationLoad() {
+
+                if (page === 1) {
+
+                    rankInsertHtml = "";
+                    onload();
+                    careatpage();
+                    setpage();
+                    document.getElementById("rank_list").innerHTML = "";
+                }
+                else if (1 < page && page < time) {
+                    rankInsertHtml = "";
+                    onload();
+                    careatpage();
+                    setpage();
+                    // document.getElementById("rank_list").innerHTML = "";
+                } else if (page === time) {
+                    rankInsertHtml = "";
+                    onload();
+                    careatpage();
+                    page = 1;
+                    page0 = 0;
+                    document.getElementById("rank_list").innerHTML = "";
+
+                    clearInterval(tral);
+                }
+
+                document.getElementById("rank_list").innerHTML = rankInsertHtml;
+                document.getElementById('shangyiye').addEventListener('click',onClickshangyiye, false);
+                document.getElementById('xiayiye').addEventListener('click',onClickxiayiye, false);
+                // setTimeout(locationLoad, 900,1);
+            },3000)
+            // },900)
+        }
+        function defen(data){
+            var scorll_list = data;
+            var time = Math.ceil(scorll_list[0].length / 8);
+            var page0 = 0;
+            var page = 1;
+
+            var scorll_Text = '';
+
+            function onload() {
+                for (var i in scorll_list) {
+                    if (i >= page0 * 8 && i < page * 8) {
+                        scorll_Text += '<div>';
+                        // debugger
+                        scorll_Text += ' <span id="blue">' + scorll_list[i][0].p1 + ' </span>成功击败';
+                        scorll_Text += ' <span id="red">' + scorll_list[i][0].p2 + '</span>得';
+                        scorll_Text += ' <span id="score">' + scorll_list[i][0].score + '</span>分';
+                        scorll_Text += '</div>';
+                    }
+                }
+            }
+
+            function setpage() {
+                if (page <= time) {
+                    page0 = page0 + 1;
+                    page = page + 1;
+                }
+                document.getElementById("scorll_area").innerHTML = "";
+            }
+
+            locationLoad();
+
+            function locationLoad() {
+                if (page == 1) {
+                    scorll_Text = "";
+                    onload();
+                    setpage();
+                    document.getElementById("scorll_area").innerHTML = "";
+                    // document.getElementById("rank_list").innerHTML = "";
+                }
+                else if (1 < page && page < time) {
+                    scorll_Text = "";
+                    onload();
+                    setpage();
+                } else if (page == time) {
+                    scorll_Text = "";
+                    onload();
+                    page = 1;
+                    page0 = 0;
+                    document.getElementById("scorll_area").innerHTML = "";
+                }
+                document.getElementById("scorll_area").innerHTML = scorll_Text;
+                // setTimeout(locationLoad, 3000);
+            }
+
+        }
+        var formData =[
+            [{
+                "p1": "机器人",
+                "p2": "东海证券",
+                "score": "500"
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }, {
+                "x": 58.673888124687,
+                "y": -119.4618516994,
+                "z": -69.159590609248
+            }],
+            [{
+                "p1": "机器人",
+                "p2": "渤海证券",
+                "score": "100"
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }, {
+                "x": 18.653725230709,
+                "y": 19.441692704382,
+                "z": -147.55640438204
+            }],
+            [{
+                "p1": "财付通",
+                "p2": "机器人",
+                "score": "100"
+            }, {
+                "x": -130.74354462284,
+                "y": 47.610795678516,
+                "z": 55.998930122535
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }],
+            [{
+                "p1": "东海证券",
+                "p2": "机器人",
+                "score": "500"
+            }, {
+                "x": 58.673888124687,
+                "y": -119.4618516994,
+                "z": -69.159590609248
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }],
+            [{
+                "p1": "渤海证券",
+                "p2": "机器人",
+                "score": "500"
+            }, {
+                "x": 18.653725230709,
+                "y": 19.441692704382,
+                "z": -147.55640438204
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }],
+            [{
+                "p1": "工商银行",
+                "p2": "机器人",
+                "score": "300"
+            }, {
+                "x": 143.57133866974,
+                "y": 27.901477824755,
+                "z": -33.232714019891
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }],
+            [{
+                "p1": "工商银行",
+                "p2": "机器人",
+                "score": "100"
+            }, {
+                "x": 143.57133866974,
+                "y": 27.901477824755,
+                "z": -33.232714019891
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }],
+            [{
+                "p1": "东海证券",
+                "p2": "机器人",
+                "score": "200"
+            }, {
+                "x": 58.673888124687,
+                "y": -119.4618516994,
+                "z": -69.159590609248
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }]
+        ];
+        function ad(){
+            // $.ajax({
+            //     url:"http://192.168.4.159/race/main/admin/melee/3Ddynamic/info/back_flag.php",
+            //     type:'GET',
+            //     dataType:'JSONP',
+            //     success: function(data){
+            //         // $('body').append( "Name: " + data );
+            //         console.log(data);
+            //     },
+            //     error:function(){
+            // debugger
+            // console.log(formData);
+            var type = 1;
+            ThreeView.onClickcareatline(formData,type);
+            // pertext(formData);
+            defen(formData);
+            setTimeout(ad, 2000);
+            //     }
+            // });
+        }
+        ad();
+        //实时攻击
+        var bude=[
+            [{
+                "p1": "东海证券",
+                "p2": "蚂蚁金服"
+            }, {
+                    "x": 58.673888124687,"y": -119.4618516994,"z": -69.159590609248
+                }, {
+                 "x": 6.8493016243125,"y": 67.515028733869,"z": 133.75187262115
+            }, {
+                "type": "IP",
+                "attack_port": "1",
+                "attack_time": "10:53:19",
+                "attack_color": "#fdff46"
+            }],
+            [{
+                "p1": "蚂蚁金服",
+                "p2": "东海证券"
+            }, {
+                "x": 6.8493016243125,
+                "y": 67.515028733869,
+                "z": 133.75187262115
+            }, {
+                "x": 58.673888124687,
+                "y": -119.4618516994,
+                "z": -69.159590609248
+            }, {
+                "type": "ICMP",
+                "attack_port": "1",
+                "attack_time": "10:57:38",
+                "attack_color": "#ff5e5e"
+            }],
+            [{
+                "p1": "机器人",
+                "p2": "东海证券"
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }, {
+                "x": 58.673888124687,
+                "y": -119.4618516994,
+                "z": -69.159590609248
+            }, {
+                "type": "IP",
+                "attack_port": "1",
+                "attack_time": "10:54:22",
+                "attack_color": "#bd9772"
+            }],
+            [{
+                "p1": "财付通",
+                "p2": "财付通"
+            }, {
+                "x": -130.74354462284,
+                "y": 47.610795678516,
+                "z": 55.998930122535
+            }, {
+                "x": -130.74354462284,
+                "y": 47.610795678516,
+                "z": 55.998930122535
+            }, {
+                "type": "IP",
+                "attack_port": "1",
+                "attack_time": "10:49:04",
+                "attack_color": "#fd87c4"
+            }],
+            [{
+                "p1": "东海证券",
+                "p2": "机器人"
+            }, {
+                "x": 58.673888124687,
+                "y": -119.4618516994,
+                "z": -69.159590609248
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }, {
+                "type": "IP",
+                "attack_port": "1",
+                "attack_time": "10:58:15",
+                "attack_color": "#5bc3ff"
+            }],
+            [{
+                "p1": "财付通",
+                "p2": "机器人"
+            }, {
+                "x": -130.74354462284,
+                "y": 47.610795678516,
+                "z": 55.998930122535
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }, {
+                "type": "IP",
+                "attack_port": "1",
+                "attack_time": "10:49:20",
+                "attack_color": "#fd87c4"
+            }],
+            [{
+                "p1": "交通银行",
+                "p2": "机器人"
+            }, {
+                "x": -57.935387441756,
+                "y": 126.57966229963,
+                "z": -55.850154982441
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }, {
+                "type": "UDP",
+                "attack_port": "1",
+                "attack_time": "10:52:14",
+                "attack_color": "#ff00f6"
+            }],
+            [{
+                "p1": "财付通",
+                "p2": "工商银行"
+            }, {
+                "x": -130.74354462284,
+                "y": 47.610795678516,
+                "z": 55.998930122535
+            }, {
+                "x": 143.57133866974,
+                "y": 27.901477824755,
+                "z": -33.232714019891
+            }, {
+                "type": "ICMP",
+                "attack_port": "1",
+                "attack_time": "10:52:35",
+                "attack_color": "#bd9772"
+            }],
+            [{
+                "p1": "财付通",
+                "p2": "机器人"
+            }, {
+                "x": -130.74354462284,
+                "y": 47.610795678516,
+                "z": 55.998930122535
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }, {
+                "type": "IP",
+                "attack_port": "1",
+                "attack_time": "10:49:20",
+                "attack_color": "#fd87c4"
+            }],
+            [{
+                "p1": "交通银行",
+                "p2": "机器人"
+            }, {
+                "x": -57.935387441756,
+                "y": 126.57966229963,
+                "z": -55.850154982441
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }, {
+                "type": "UDP",
+                "attack_port": "1",
+                "attack_time": "10:52:14",
+                "attack_color": "#ff00f6"
+            }],
+            [{
+                "p1": "财付通",
+                "p2": "财付通"
+            }, {
+                "x": -130.74354462284,
+                "y": 47.610795678516,
+                "z": 55.998930122535
+            }, {
+                "x": -130.74354462284,
+                "y": 47.610795678516,
+                "z": 55.998930122535
+            }, {
+                "type": "IP",
+                "attack_port": "1",
+                "attack_time": "10:49:04",
+                "attack_color": "#fd87c4"
+            }],
+            [{
+                "p1": "东海证券",
+                "p2": "机器人"
+            }, {
+                "x": 58.673888124687,
+                "y": -119.4618516994,
+                "z": -69.159590609248
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }, {
+                "type": "IP",
+                "attack_port": "1",
+                "attack_time": "10:58:15",
+                "attack_color": "#5bc3ff"
+            }],
+            [{
+                "p1": "财付通",
+                "p2": "机器人"
+            }, {
+                "x": -130.74354462284,
+                "y": 47.610795678516,
+                "z": 55.998930122535
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }, {
+                "type": "IP",
+                "attack_port": "1",
+                "attack_time": "10:49:20",
+                "attack_color": "#fd87c4"
+            }],
+            [{
+                "p1": "交通银行",
+                "p2": "机器人"
+            }, {
+                "x": -57.935387441756,
+                "y": 126.57966229963,
+                "z": -55.850154982441
+            }, {
+                "x": -15.926445064653,
+                "y": -52.206268339831,
+                "z": 139.69586052007
+            }, {
+                "type": "UDP",
+                "attack_port": "1",
+                "attack_time": "10:52:14",
+                "attack_color": "#ff00f6"
+            }],
+            [{
+                "p1": "财付通",
+                "p2": "工商银行"
+            }, {
+                "x": -130.74354462284,
+                "y": 47.610795678516,
+                "z": 55.998930122535
+            }, {
+                "x": 143.57133866974,
+                "y": 27.901477824755,
+                "z": -33.232714019891
+            }, {
+                "type": "ICMP",
+                "attack_port": "1",
+                "attack_time": "10:52:35",
+                "attack_color": "#bd9772"
+            }],
+
+        ];
+        function budefen(){
+            var url = "http://192.168.4.159/race/main/admin/melee/3Ddynamic/info/back_flag.php";
+            // $.ajax({
+            //     url:"http://192.168.4.159/race/main/admin/melee/3Ddynamic/info/back_flag.php",
+            //     type:'GET',
+            //     dataType:'JSONP',
+            //     success: function(data){
+            //         // $('body').append( "Name: " + data );
+            //         console.log(data);
+            //     },
+            //     error:function(){
+            var type = 2;
+            ThreeView.onClickcareatline(bude,type);
+            pertext(bude);
+            setTimeout(budefen, 2000);
+            //     }
+            // });
+        }
+        budefen();
+
+        var paihang={
+            "json": [{
+                "username": "HZ1",
+                "playerName": "渤海证券",
+                "user_picture": "bhzj.png",
+                "rank": 1,
+                "score": 11300
+            }, {
+                "username": "HZ4",
+                "playerName": "工商银行",
+                "user_picture": "gsyh.png",
+                "rank": 2,
+                "score": 10400
+            }, {
+                "username": "HZ5",
+                "playerName": "建设银行",
+                "user_picture": "jsyh.png",
+                "rank": 3,
+                "score": 10200
+            }, {
+                "username": "HZ3",
+                "playerName": "东海证券",
+                "user_picture": "dhzj.png",
+                "rank": 4,
+                "score": 10200
+            }, {
+                "username": "HZ13",
+                "playerName": "兴业银行",
+                "user_picture": "xyyh.png",
+                "rank": 5,
+                "score": 10100
+            }, {
+                "username": "HZ6",
+                "playerName": "交通银行",
+                "user_picture": "jtyh.png",
+                "rank": 6,
+                "score": 10000
+            }, {
+                "username": "HZ7",
+                "playerName": "蚂蚁金服",
+                "user_picture": "myjf.png",
+                "rank": 7,
+                "score": 10000
+            }, {
+                "username": "HZ9",
+                "playerName": "农业银行",
+                "user_picture": "nyyh.png",
+                "rank": 8,
+                "score": 10000
+            }, {
+                "username": "HZ10",
+                "playerName": "平安保险集团",
+                "user_picture": "nyyh.png",
+                "rank": 9,
+                "score": 10000
+            }, {
+                "username": "HZ11",
+                "playerName": "太平保险集团",
+                "user_picture": "nyyh.png",
+                "rank": 10,
+                "score": 10000
+            }, {
+                "username": "HZ12",
+                "playerName": "网联清算",
+                "user_picture": "wlqs.png",
+                "rank": 11,
+                "score": 10000
+            }, {
+                "username": "HZ14",
+                "playerName": "云南农信",
+                "user_picture": "ynnx.png",
+                "rank": 12,
+                "score": 10000
+            }, {
+                "username": "HZ15",
+                "playerName": "招商证券",
+                "user_picture": "zszj.png",
+                "rank": 13,
+                "score": 10000
+            }, {
+                "username": "HZ16",
+                "playerName": "郑州银行",
+                "user_picture": "zzyh.png",
+                "rank": 14,
+                "score": 10000
+            }, {
+                "username": "HZ17",
+                "playerName": "中国银行",
+                "user_picture": "zgyh.png",
+                "rank": 15,
+                "score": 10000
+            }, {
+                "username": "HZ18",
+                "playerName": "中国银联",
+                "user_picture": "zgyl.png",
+                "rank": 16,
+                "score": 10000
+            }, {
+                "username": "HZ19",
+                "playerName": "中信银行",
+                "user_picture": "zxyh.png",
+                "rank": 17,
+                "score": 10000
+            }, {
+                "username": "HZ20",
+                "playerName": "众安保险",
+                "user_picture": "zabx.png",
+                "rank": 18,
+                "score": 10000
+            }, {
+                "username": "HZ2",
+                "playerName": "财付通",
+                "user_picture": "cft.png",
+                "rank": 19,
+                "score": 10000
+            }, {
+                "username": "NPC",
+                "playerName": "机器人",
+                "user_picture": "nyyh.png",
+                "rank": 20,
+                "score": 7900
+            }]
+        };
+        function paihangbang(){
+            // var url = "http://192.168.4.159/race/main/admin/melee/3Ddynamic/info/back_flag.php";
+            // var formData = new FormData();
+            var url = "http://192.168.4.159/race/main/admin/melee/3Ddynamic/info/back_flag.php";
+            // $.ajax({
+            //     url:"http://192.168.4.159/race/main/admin/melee/3Ddynamic/info/back_flag.php",
+            //     type:'GET',
+            //     dataType:'JSONP',
+            //     success: function(data){
+            //         // $('body').append( "Name: " + data );
+            //         console.log(data);
+            //     },
+            //     error:function(){
+
+            phbdata = paihang;
+            phb(paihang);
+            setTimeout(paihangbang, 9000);
+            //     }
+            // });
+        }
+        paihangbang();
+
+        function onClickshangyiye(){
+            if(page<time){
+                page -=1;
+                if(page===0){
+                    page = time - 1;
+                }
+                rankInsertHtml = "";
+
+                rankInsertHtml = ' <ul>';
+                rankInsertHtml += '<a href="rank.html">';
+                for (var i in rank_list) {
+                    if(page === 1 ){
+                        if (i >= ((page-1) * 10) && i < page * 10) {
+                            rankInsertHtml += '<li>';
+                            rankInsertHtml += ' <span>' + rank_list[i].rank + '</span>';
+                            rankInsertHtml += ' <span><img src="' + "./asset/" + rank_list[i].user_picture + '" alt="" /></span>';
+                            rankInsertHtml += ' <span class="team" style="width: 100px;">' + rank_list[i].playerName + '</span>';
+                            rankInsertHtml += ' <span class="getScore">' + rank_list[i].score + '</span>';
+                            rankInsertHtml += '</li>';
+                            rankInsertHtml += '<div class="back_Uinfo"></div>';
+                        }
+                    }else{
+                        if(i<3){
+                            rankInsertHtml += '<li>';
+                            rankInsertHtml += ' <span>' + rank_list[i].rank + '</span>';
+                            rankInsertHtml += ' <span><img src="' + "./asset/" + rank_list[i].user_picture + '" alt="" /></span>';
+                            rankInsertHtml += ' <span class="team" style="width: 100px;">' + rank_list[i].playerName + '</span>';
+                            rankInsertHtml += ' <span class="getScore">' + rank_list[i].score + '</span>';
+                            rankInsertHtml += '</li>';
+                            rankInsertHtml += '<div class="back_Uinfo"></div>';
+                        }
+
+                        // debugger
+                        if (i >= (page * 7)-4 && i < (page * 7)+3) {
+                            rankInsertHtml += '<li>';
+                            rankInsertHtml += ' <span>' + rank_list[i].rank + '</span>';
+                            rankInsertHtml += ' <span><img src="' + "./asset/" + rank_list[i].user_picture + '" alt="" /></span>';
+                            rankInsertHtml += ' <span class="team" style="width: 100px;">' + rank_list[i].playerName + '</span>';
+                            rankInsertHtml += ' <span class="getScore">' + rank_list[i].score + '</span>';
+                            rankInsertHtml += '</li>';
+                            rankInsertHtml += '<div class="back_Uinfo"></div>';
+                        }
+
+                    }
+
+                }
+                document.getElementById("rank_list").innerHTML = "";
+                rankInsertHtml += '</a>';
+                rankInsertHtml += '<li>';
+                rankInsertHtml += '<div class = "point_currage">';
+                rankInsertHtml += '<img class = "point_currage_image" id="shangyiye" src = "./asset/pointLeft.png" />';
+                rankInsertHtml += "第" + page + "页";
+                rankInsertHtml += '<img class = "point_currage_image" id="xiayiye" src = "./asset/pointRight.png" />';
+                rankInsertHtml += '</div> </li>';
+                rankInsertHtml += '</ul>';
+                document.getElementById("rank_list").innerHTML = rankInsertHtml;
+                document.getElementById('shangyiye').addEventListener('click',onClickshangyiye, false);
+                document.getElementById('xiayiye').addEventListener('click',onClickxiayiye, false);
+
+            }
+        }
+        function onClickxiayiye(){
+            if(page < time){
+                page +=1;
+
+                rankInsertHtml = "";
+                rankInsertHtml = ' <ul>';
+                rankInsertHtml += '<a href="rank.html">';
+                for (var i in rank_list) {
+                    if(page === 1 ){
+                        if (i >= ((page-1) * 10) && i < page * 10) {
+                            rankInsertHtml += '<li>';
+                            rankInsertHtml += ' <span>' + rank_list[i].rank + '</span>';
+                            rankInsertHtml += ' <span><img src="' + "./asset/" + rank_list[i].user_picture + '" alt="" /></span>';
+                            rankInsertHtml += ' <span class="team" style="width: 100px;">' + rank_list[i].playerName + '</span>';
+                            rankInsertHtml += ' <span class="getScore">' + rank_list[i].score + '</span>';
+                            rankInsertHtml += '</li>';
+                            rankInsertHtml += '<div class="back_Uinfo"></div>';
+                        }
+                    }else{
+                        if(i<3){
+                            rankInsertHtml += '<li>';
+                            rankInsertHtml += ' <span>' + rank_list[i].rank + '</span>';
+                            rankInsertHtml += ' <span><img src="' + "./asset/" + rank_list[i].user_picture + '" alt="" /></span>';
+                            rankInsertHtml += ' <span class="team" style="width: 100px;">' + rank_list[i].playerName + '</span>';
+                            rankInsertHtml += ' <span class="getScore">' + rank_list[i].score + '</span>';
+                            rankInsertHtml += '</li>';
+                            rankInsertHtml += '<div class="back_Uinfo"></div>';
+                        }
+
+                        // debugger
+                        if (i >= (page * 7)-4 && i < (page * 7)+3) {
+                            rankInsertHtml += '<li>';
+                            rankInsertHtml += ' <span>' + rank_list[i].rank + '</span>';
+                            rankInsertHtml += ' <span><img src="' + "./asset/" + rank_list[i].user_picture + '" alt="" /></span>';
+                            rankInsertHtml += ' <span class="team" style="width: 100px;">' + rank_list[i].playerName + '</span>';
+                            rankInsertHtml += ' <span class="getScore">' + rank_list[i].score + '</span>';
+                            rankInsertHtml += '</li>';
+                            rankInsertHtml += '<div class="back_Uinfo"></div>';
+                        }
+
+                    }
+
+                }
+                document.getElementById("rank_list").innerHTML = "";
+                rankInsertHtml += '</a>';
+                rankInsertHtml += '<li>';
+                rankInsertHtml += '<div class = "point_currage">';
+                rankInsertHtml += '<img class = "point_currage_image" id="shangyiye" src = "./asset/pointLeft.png" />';
+                rankInsertHtml += "第" + page + "页";
+                rankInsertHtml += '<img class = "point_currage_image" id="xiayiye" src = "./asset/pointRight.png" />';
+                rankInsertHtml += '</div> </li>';
+                rankInsertHtml += '</ul>';
+                document.getElementById("rank_list").innerHTML = rankInsertHtml;
+                document.getElementById('shangyiye').addEventListener('click',onClickshangyiye, false);
+                document.getElementById('xiayiye').addEventListener('click',onClickxiayiye, false);
+            }
+        }
+    }())
+</script>
 </body>
 </html>

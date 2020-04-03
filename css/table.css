@@ -1,0 +1,46 @@
+body {
+   background: rgb(12, 12, 12);
+}
+
+.bodyDiv {
+   width: 99%;
+   height: 98%;
+   position: absolute;
+   z-index: 10000;
+}
+
+.leftDiv {
+   float: left;
+   background: #fff;
+   height: 100%;
+   width: 15%;
+   min-height: 80%;
+   border: 3px solid rgb(50, 50, 50);
+   background: rgb(8, 8, 8);
+}
+
+.leftDiv li {
+   border-bottom: 3px dotted #adacac;
+   font-style: #fff;
+}
+
+.leftDiv input {
+   margin: 20px 10px
+}
+
+.rightDiv {
+   float: right;
+   height: 100%;
+   width: 82%;
+   min-height: 80%;
+   border: 3px solid rgb(88, 85, 85);
+}
+
+#canvas {
+   background: url(../data-gl/asset/earth.png) no-repeat;
+   width: 82%;
+   height: 100%;
+   position: absolute;
+   z-index: 10000;
+   background-size: 100% 100%;
+}

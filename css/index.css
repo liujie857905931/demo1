@@ -1,0 +1,471 @@
+.box_logo {
+  color: #fff;
+  position: absolute;
+  left: 40%;
+  z-index: 1000;
+  top: 3%;
+  font-size: 30px;
+}
+
+.Time_box {
+  color: rgb(224, 28, 28);
+  position: absolute;
+  right: 10%;
+  z-index: 1000;
+  top: 10%;
+  width: 100px;
+  height: 120px;
+}
+
+/* histogram and timeline at bottom */
+
+#history {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  margin-left: -325px;
+  z-index: 1000;
+  background-color: rgba(43, 43, 43, 0.9);
+  display: none;
+}
+
+#history ul {
+  list-style-type: none;
+  margin: 10px;
+  padding: 0;
+  padding-bottom: 15px;
+  padding-top: 22px;
+  color: white;
+  font-size: 12px;
+  font-family: 'Roboto';
+  width: 668px;
+  /*background: url('../asset/timelineBG.png') 8px 0 no-repeat;*/
+  /*to be resized!*/
+}
+
+#history ul li {
+  width: 35px;
+  float: left;
+  text-align: center;
+  margin-top: -30px;
+  padding-top: 30px;
+  cursor: pointer;
+}
+
+#history .timeline #handle {
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  /*background: url('yearHandle.png') 0px 0 no-repeat;*/
+  position: absolute;
+  bottom: 20px;
+  left: 642px;
+}
+
+#history .graph {
+  display: none;
+}
+
+#history .close {
+  width: 8px;
+  height: 8px;
+  /*background: url('close.png') 0 0 no-repeat;*/
+  margin-right: 8px;
+  margin-top: 5px;
+  float: right;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+#history .labels {
+  margin-right: 35px;
+}
+
+#history .labels .change {
+  font-family: RopaSans;
+  font-size: 23px;
+  color: white;
+  margin-left: 31px;
+  float: left;
+  margin-top: 10px;
+}
+
+#history .labels .imports {
+  float: right;
+  font-family: Roboto;
+  font-size: 14px;
+  color: #70B4CB;
+  margin-top: 10px;
+}
+
+#history .labels .exports {
+  float: right;
+  font-family: Roboto;
+  font-size: 14px;
+  color: #FFA90B;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+#histogram path {
+  fill: none;
+  stroke-width: 2px;
+}
+
+#histogram .export {
+  stroke: #FFA90B;
+}
+
+#histogram .import {
+  stroke: #44B2D4;
+}
+
+#histogram .tick {
+  fill: none;
+  stroke: #959595;
+}
+
+#histogram .tickLbl {
+  fill: #fff;
+  font-size: 10px;
+  font-family: Roboto;
+}
+
+#histogram .plusMinus {
+  font-size: 16px;
+  fill: #fff;
+}
+
+#histogram ellipse.year {
+  fill: #fff;
+}
+
+#histogram text.yearLabel {
+  fill: #fff;
+}
+
+#moreTime {
+  width: 434px;
+  position: absolute;
+  bottom: 8%;
+  left: 5%;
+  z-index: 10000;
+  /*border: 1px solid #fff;*/
+  /*background: url(../asset/shishi.png)no-repeat;*/
+  background: url(../photos/budefen.png)no-repeat;
+  background-size: 100% 100%;
+}
+
+#moreP #Ctop {
+  color: #fff;
+}
+
+#moreP .content {
+  min-height: 400px;
+}
+
+.top {
+  color: #45b4eb;
+  width: 391px;
+  padding: 5px;
+}
+
+#moreTime span,
+#moreP span {
+  width: 74px;
+  text-align: center;
+  display: inline-block;
+}
+
+#moreP .content .team {
+  /*color: #DF91E5;*/
+  color: #FF33CC;
+}
+
+#moreP .content .getScore {
+  color: #e05e12;
+}
+
+#moreP .content .lostSocre {
+  color: #fa1515;
+}
+
+#moreP .content img {
+  width: 20px;
+  height: 20px;
+}
+
+#moreP li span:nth-of-type(1) {
+  background: url(../asset/paiming.png)no-repeat center;
+  background-size: 38% 122%;
+}
+
+#moreP li:nth-of-type(1) span:nth-of-type(1),
+#moreP li:nth-of-type(2) span:nth-of-type(1),
+#moreP li:nth-of-type(3) span:nth-of-type(1) {
+  color: rgb(250, 128, 10)
+}
+
+#moreTime ul,
+#moreP ul {
+  padding: 0;
+}
+
+#moreTime li,
+#moreP li {
+  padding: 5px 10px;
+  list-style: none;
+  /* color: #f78105; */
+  padding: 0;
+  margin-top: 7px;
+}
+.bao{
+  /*background: url(../photos/1.png)no-repeat;*/
+  /*background-size: 100% 100%;*/
+  /*position: absolute;*/
+  /*top: 1px;*/
+  /*left: 5%;*/
+  /*z-index: 1000;*/
+  /*!*background-size: 600px 800px;*!*/
+  /*width:520px;*/
+  /*height:100%;*/
+  /*text-align: center;*/
+
+}
+.bao #moreP {
+  position: absolute;
+  /*top: 25%;*/
+  /*left: 10%;*/
+  top: 5%;
+  left: 5%;
+  z-index: 10000;
+  /*border: 1px #959595 solid;*/
+  /*background: url(../asset/PBack.png)no-repeat;*/
+  /*background: url(../photos/paihangbang.png)no-repeat;*/
+  background: url(../photos/lanshang1.png)no-repeat;
+  /*background: url(../photos/1.png)no-repeat;*/
+  background-size: 100% 100%;
+}
+
+.fd {
+  position: absolute;
+  right: 100px;
+  top: 20px;
+  /*margin-left: -100px;*/
+  color: #fff;
+  z-index: 10000;
+}
+
+.fd .jia,
+.fd .jian {
+  padding: 4px 6px;
+  background: #959595;
+  float: left;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.fd .input {
+  width: 280px;
+  height: auto;
+}
+
+.fd .input input,
+.fd .input button {
+  float: left;
+  height: 29px;
+}
+
+.fd .input input {
+  border: 1px solid #ccc;
+  padding: 0 4px;
+  height: 27px;
+}
+
+.zhandui {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  color: #fff;
+  z-index: 10000;
+  padding: 5px;
+  background: #959595;
+}
+
+.left {
+  float: left;
+  color: #fff;
+}
+
+#title {
+  position: absolute;
+  color: #45b4eb;
+  z-index: 10000;
+  padding: 13px;
+  right: 5%;
+  top: 30%;
+  font-size: 20px;
+  /*border:1px solid #ccc;*/
+  /*background: url(../asset/defen.png)no-repeat;*/
+  background: url(../asset/youbaind.png)no-repeat;
+  background-size: 100% 100%;
+}
+
+#title #score {
+  color: #f78105;
+}
+
+#title #blue {
+  color: rgb(211, 211, 211);
+}
+
+#title #red {
+  color: rgb(211, 211,211);
+}
+
+.Zname {
+  font-size: 26px;
+}
+
+#moreTime .content {
+  width: 391px;
+  height: 140px;
+  border-top: 1px solid #fff;
+  font-size: 12px;
+}
+
+#moreTime .content ul li {
+  padding: 2px 0;
+  border-bottom: 1px solid #fff;
+}
+
+#moreTime .content .attckTime {
+  /*color: rgb(172, 228, 83)*/
+}
+
+#moreTime .content .attckName {
+  /*color: rgb(69, 230, 82)*/
+}
+
+#moreTime .content .attckTarget {
+  /*color: rgb(55, 233, 218)*/
+}
+
+#moreTime .content .attckType {
+  /*color: rgb(27, 93, 235)*/
+}
+
+#moreTime .content .attckPort {
+  /*color: rgb(97, 37, 236)*/
+}
+
+.Time_box {
+  padding: 12px;
+  /*background: url(../asset/sousuo.png)no-repeat;*/
+  background: url(../asset/daojs.png)no-repeat;
+  background-size: 100% 100%;
+  /*text-align: center;*/
+}
+.Time_box span{
+  position: absolute;
+  top: 50%;
+  left:25%;
+}
+.titlebox {
+  color: #45b4eb;
+  margin-top: 19px;
+}
+
+.back_Uinfo {
+  width: 100%;
+  height: 4px;
+  background: url(../asset/xiahua.png)no-repeat;
+  background-size: 97% 100%;
+}
+
+.title_in {
+  font-size: 18px;
+  width: 16px;
+  color: #fff;
+  float: right;
+  margin-right: 14px;
+  margin-top: 44px;
+}
+
+.fenxiang {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  right: 10%;
+  bottom: 10%;
+  z-index: 1000;
+  background: url(../asset/fenxiang.png) no-repeat;
+  background-size: 100% 100%;
+  cursor: pointer;
+}
+
+.click_stop {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  right: 10%;
+  bottom: 10%;
+  z-index: 100;
+  background: url(../asset/click_stop.png) no-repeat;
+  background-size: 100% 100%;
+  cursor: pointer;
+}
+
+.point_currage {
+  color: #45b4eb;
+  float: right;
+  padding-right: 10px;
+  padding-bottom: 10px;
+}
+
+.point_currage_image {
+  width: 15px;
+  height: 15px;
+}
+
+.point_div {
+  color: #f78105;
+}
+
+.infoLeft {
+  width: 200px;
+  height: 50px;
+  left: 45%;
+  top: 30%;
+  z-index: 10000;
+  position: absolute;
+}
+
+.infoLeft img,
+.infoRight img {
+  margin-left: 5px;
+  width: 30px;
+  height: 30px;
+}
+
+.infoLeft .country,
+.infoRight .country {
+  color: #f78105;
+  font-size: 14px;
+}
+
+.infoRight {
+  width: 200px;
+  height: 50px;
+  right: 35%;
+  top: 50%;
+  z-index: 10000;
+  position: absolute;
+}
+
+#earth {
+  width: 100vw;
+  height: 100vh;
+  background: url(../asset/startfield1.jpg) no-repeat;
+  background-size: 100% 100%;
+}
